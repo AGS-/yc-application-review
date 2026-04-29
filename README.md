@@ -52,6 +52,32 @@ The skill defaults to partner mode. To get section-by-section rewrites:
 /yc-review coach
 ```
 
+## Headless mode (`bin/yc-review`)
+
+For one-shot reviews from a script or pipeline, use the bash wrapper. It works directly from this repo with no install step — it inlines `SKILL.md` via `claude --append-system-prompt`.
+
+```bash
+# Prose review (partner mode):
+./bin/yc-review path/to/draft.md
+
+# Coach mode (section-by-section, scored, with rewrites):
+./bin/yc-review --coach path/to/draft.md
+
+# JSON output (parseable, no prose, no markdown fence):
+./bin/yc-review --json path/to/draft.md | jq .
+```
+
+Try it against the bundled synthetic sample (a deliberately weak draft used to smoke-test the rubric):
+
+```bash
+./bin/yc-review application-samples/flowsync-weak.md
+./bin/yc-review --json application-samples/flowsync-weak.md | jq .
+```
+
+The `--json` flag returns a fixed shape (`verdict`, `verdict_reason`, `what_works`, `what_doesnt[]`, `top_3_fixes`, `the_one_question`, `tarpit_flag`) — useful for building eval suites against published YC applications.
+
+Requirements: bash and `claude` on `PATH`. No Node, Python, or other runtimes.
+
 ## What you get
 
 ```
@@ -109,11 +135,15 @@ It does not predict whether you'll get in. YC selection has too much noise.
 
 ```
 yc-application-review/
-├── SKILL.md              # the skill itself (the prompt)
-├── README.md             # this file
-├── LICENSE               # MIT
-└── templates/
-    └── YC_APPLICATION.md # blank template with the current YC questions
+├── SKILL.md                  # the skill itself (the prompt)
+├── README.md                 # this file
+├── LICENSE                   # MIT
+├── bin/
+│   └── yc-review             # headless bash wrapper (claude -p)
+├── templates/
+│   └── YC_APPLICATION.md     # blank template with the current YC questions
+└── application-samples/      # sample drafts for testing / evals
+    └── flowsync-weak.md      # synthetic weak draft (expected verdict: ARCHIVE)
 ```
 
 ## Contributing

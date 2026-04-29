@@ -1,0 +1,133 @@
+#!/usr/bin/env bash
+# yc-review — headless wrapper around the yc-review Claude Code skill.
+#
+# Usage:
+#   yc-review [--json] [--coach] <path-to-draft.md>
+#
+# Examples:
+#   yc-review draft.md
+#   yc-review --json draft.md | jq .
+#   yc-review --coach draft.md
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: yc-review [--json] [--coach] <path-to-draft.md>
+
+  --json    Emit a JSON object (parseable by JSON.parse). Implies non-interactive.
+  --coach   Section-by-section walkthrough with rewrites. Mutually exclusive with --json.
+  -h, --help  Show this message.
+
+The draft file must be a markdown file containing a YC application draft
+(typically a filled-in copy of templates/YC_APPLICATION.md).
+EOF
+}
+
+json_mode=0
+coach_mode=0
+draft_path=""
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --json)
+      json_mode=1
+      shift
+      ;;
+    --coach)
+      coach_mode=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    --)
+      shift
+      break
+      ;;
+    -*)
+      echo "yc-review: unknown flag: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+    *)
+      if [ -n "$draft_path" ]; then
+        echo "yc-review: only one draft path is supported (got '$draft_path' and '$1')" >&2
+        exit 2
+      fi
+      draft_path="$1"
+      shift
+      ;;
+  esac
+done
+
+if [ -z "$draft_path" ] && [ $# -gt 0 ]; then
+  draft_path="$1"
+fi
+
+if [ -z "$draft_path" ]; then
+  echo "yc-review: missing draft path" >&2
+  usage >&2
+  exit 2
+fi
+
+if [ ! -f "$draft_path" ]; then
+  echo "yc-review: file not found: $draft_path" >&2
+  exit 1
+fi
+
+if ! command -v claude >/dev/null 2>&1; then
+  echo "yc-review: 'claude' is not on PATH. Install Claude Code: https://docs.anthropic.com/en/docs/claude-code" >&2
+  exit 127
+fi
+
+# Resolve the directory containing this script, following symlinks. Lets the
+# wrapper run from anywhere (PATH, symlinked, etc.) and still find SKILL.md.
+script_path="${BASH_SOURCE[0]}"
+while [ -L "$script_path" ]; do
+  link_target="$(readlink "$script_path")"
+  case "$link_target" in
+    /*) script_path="$link_target" ;;
+    *)  script_path="$(cd "$(dirname "$script_path")" && pwd)/$link_target" ;;
+  esac
+done
+script_dir="$(cd "$(dirname "$script_path")" && pwd)"
+skill_dir="$(cd "$script_dir/.." && pwd)"
+skill_md="$skill_dir/SKILL.md"
+
+if [ ! -f "$skill_md" ]; then
+  echo "yc-review: SKILL.md not found at $skill_md" >&2
+  exit 1
+fi
+
+mode_flags=""
+if [ "$json_mode" -eq 1 ] && [ "$coach_mode" -eq 1 ]; then
+  mode_flags="--json --coach"
+elif [ "$json_mode" -eq 1 ]; then
+  mode_flags="--json"
+elif [ "$coach_mode" -eq 1 ]; then
+  mode_flags="--coach"
+fi
+
+draft_content="$(cat "$draft_path")"
+
+# Build the user prompt. The "Review this YC application:" preamble is what
+# the SKILL.md "Headless detection" rule looks for, so the skill skips its
+# interactive Step 1/Step 2 and goes straight to the critique.
+user_prompt=$(cat <<EOF
+Review this YC application. ${mode_flags}
+
+The draft is below, between the BEGIN/END markers. Apply the yc-review skill rubric exactly as specified in the system prompt. Do not ask clarifying questions — produce the review directly.
+
+----- BEGIN YC APPLICATION DRAFT (${draft_path}) -----
+${draft_content}
+----- END YC APPLICATION DRAFT -----
+EOF
+)
+
+system_prompt="$(cat "$skill_md")"
+
+exec claude -p \
+  --append-system-prompt "$system_prompt" \
+  "$user_prompt"
