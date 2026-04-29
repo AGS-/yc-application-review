@@ -110,7 +110,15 @@ elif [ "$coach_mode" -eq 1 ]; then
   mode_flags="--coach"
 fi
 
-draft_content="$(cat "$draft_path")"
+# Strip a leading YAML frontmatter block ("---" ... "---") if present. Lets
+# files in application-samples/ carry metadata (company, batch, outcome,
+# source_url, etc.) without polluting the partner's view of the draft. Files
+# without frontmatter pass through untouched.
+draft_content="$(awk '
+  NR == 1 && /^---[[:space:]]*$/ { in_fm = 1; next }
+  in_fm && /^---[[:space:]]*$/   { in_fm = 0; next }
+  !in_fm                          { print }
+' "$draft_path")"
 
 # Build the user prompt. The "Review this YC application:" preamble is what
 # the SKILL.md "Headless detection" rule looks for, so the skill skips its

@@ -1,0 +1,333 @@
+#!/usr/bin/env bash
+# run-evals — run bin/yc-review --json against every application in
+# application-samples/{accepted,rejected,synthetic}/ and write a summary.
+#
+# Usage:
+#   bin/run-evals                       # run everything
+#   bin/run-evals --apps <slug>[,<slug>] # run a subset
+#   bin/run-evals -h | --help
+#
+# Output:
+#   evals/results/<UTC-timestamp>/<subdir>/<slug>.json   (one per app)
+#   evals/results/<UTC-timestamp>/<subdir>/<slug>.error.txt (on failure)
+#   evals/results/<UTC-timestamp>/summary.md
+
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Usage: bin/run-evals [--apps <slug>[,<slug>...]]
+
+  --apps <list>   Comma-separated slugs to run. Match is by filename without
+                  the .md extension (e.g. dropbox-s07, buffer-2011). If
+                  omitted, every .md under application-samples/ runs.
+  -h, --help      Show this message.
+
+Cost: each app fans out to one `claude -p` call. The current 6-app set
+should cost well under a dollar per run.
+EOF
+}
+
+apps_filter=""
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --apps)
+      shift
+      if [ $# -eq 0 ]; then
+        echo "run-evals: --apps requires a value" >&2
+        exit 2
+      fi
+      apps_filter="$1"
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    *)
+      echo "run-evals: unknown argument: $1" >&2
+      usage >&2
+      exit 2
+      ;;
+  esac
+done
+
+# Resolve repo root from this script's location.
+script_path="${BASH_SOURCE[0]}"
+while [ -L "$script_path" ]; do
+  link_target="$(readlink "$script_path")"
+  case "$link_target" in
+    /*) script_path="$link_target" ;;
+    *)  script_path="$(cd "$(dirname "$script_path")" && pwd)/$link_target" ;;
+  esac
+done
+script_dir="$(cd "$(dirname "$script_path")" && pwd)"
+repo_root="$(cd "$script_dir/.." && pwd)"
+samples_dir="$repo_root/application-samples"
+yc_review="$script_dir/yc-review"
+
+if [ ! -x "$yc_review" ]; then
+  echo "run-evals: $yc_review is not executable" >&2
+  exit 1
+fi
+
+if [ ! -d "$samples_dir" ]; then
+  echo "run-evals: $samples_dir not found" >&2
+  exit 1
+fi
+
+# Build the slug filter (if any) into a regex-friendly check via case match.
+filter_active=0
+declare -a wanted_slugs=()
+if [ -n "$apps_filter" ]; then
+  filter_active=1
+  IFS=',' read -r -a wanted_slugs <<<"$apps_filter"
+fi
+
+slug_wanted() {
+  local slug="$1"
+  if [ "$filter_active" -eq 0 ]; then
+    return 0
+  fi
+  local w
+  for w in "${wanted_slugs[@]}"; do
+    [ "$slug" = "$w" ] && return 0
+  done
+  return 1
+}
+
+# Parse a single frontmatter field (very small reader; expects `key: value`
+# inside the leading `---` block, with quotes optional). Returns empty
+# string if not found.
+fm_field() {
+  local file="$1" key="$2"
+  awk -v k="$key" '
+    NR == 1 && /^---[[:space:]]*$/ { in_fm = 1; next }
+    in_fm && /^---[[:space:]]*$/   { exit }
+    in_fm {
+      # strip trailing CR (defensive against CRLF samples)
+      sub(/\r$/, "")
+      idx = index($0, ":")
+      if (idx == 0) next
+      this_key = substr($0, 1, idx - 1)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", this_key)
+      if (this_key != k) next
+      val = substr($0, idx + 1)
+      gsub(/^[[:space:]]+|[[:space:]]+$/, "", val)
+      # strip surrounding quotes if any
+      if (val ~ /^".*"$/) val = substr(val, 2, length(val) - 2)
+      print val
+      exit
+    }
+  ' "$file"
+}
+
+# Verdict + tarpit_flag extraction from result JSON. Uses jq if available,
+# otherwise falls back to a brittle awk/grep. jq is strongly preferred.
+have_jq=0
+if command -v jq >/dev/null 2>&1; then
+  have_jq=1
+fi
+
+extract_field() {
+  local json_file="$1" field="$2"
+  if [ "$have_jq" -eq 1 ]; then
+    jq -r --arg f "$field" '.[$f] // empty' "$json_file" 2>/dev/null || true
+  else
+    # crude fallback — only works for top-level string fields
+    python3 -c '
+import json, sys
+try:
+    with open(sys.argv[1]) as f:
+        obj = json.load(f)
+    val = obj.get(sys.argv[2])
+    if val is None:
+        print("")
+    else:
+        print(val)
+except Exception:
+    print("")
+' "$json_file" "$field" 2>/dev/null || true
+  fi
+}
+
+# Decide if (truth, verdict) is a "match" per the eval rules.
+match_truth_to_verdict() {
+  local truth="$1" verdict="$2"
+  case "$truth" in
+    accepted)
+      case "$verdict" in
+        INTERVIEW|BORDERLINE) echo "yes" ;;
+        *) echo "no" ;;
+      esac
+      ;;
+    rejected|synthetic-weak)
+      case "$verdict" in
+        ARCHIVE|BORDERLINE) echo "yes" ;;
+        *) echo "no" ;;
+      esac
+      ;;
+    *)
+      echo "n/a"
+      ;;
+  esac
+}
+
+# Timestamped run directory.
+run_ts="$(date -u +%Y-%m-%dT%H%MZ)"
+run_dir="$repo_root/evals/results/$run_ts"
+mkdir -p "$run_dir"
+
+echo "run-evals: writing results to $run_dir"
+echo
+
+# Collect (subdir, slug, file) tuples.
+shopt -s nullglob
+declare -a planned=()
+for sub in synthetic accepted rejected; do
+  sub_path="$samples_dir/$sub"
+  [ -d "$sub_path" ] || continue
+  for f in "$sub_path"/*.md; do
+    slug="$(basename "$f" .md)"
+    if slug_wanted "$slug"; then
+      planned+=("$sub|$slug|$f")
+    fi
+  done
+done
+shopt -u nullglob
+
+if [ "${#planned[@]}" -eq 0 ]; then
+  echo "run-evals: no applications to run (filter='$apps_filter')" >&2
+  exit 1
+fi
+
+# Run each app. Track stats.
+total=0; ok_runs=0; errors=0
+accepted_total=0; accepted_match=0
+rejected_total=0; rejected_match=0
+synthetic_total=0; synthetic_match=0
+
+# rows: tab-separated subdir<TAB>slug<TAB>truth<TAB>verdict<TAB>match<TAB>tarpit
+rows_file="$(mktemp)"
+
+for tuple in "${planned[@]}"; do
+  IFS='|' read -r sub slug file <<<"$tuple"
+  total=$((total + 1))
+  truth="$(fm_field "$file" outcome)"
+  [ -z "$truth" ] && truth="unknown"
+
+  out_subdir="$run_dir/$sub"
+  mkdir -p "$out_subdir"
+  json_path="$out_subdir/$slug.json"
+  err_path="$out_subdir/$slug.error.txt"
+
+  echo "→ [$sub/$slug] truth=$truth"
+
+  # Capture stderr separately so we can persist on failure.
+  stderr_buf="$(mktemp)"
+  if "$yc_review" --json "$file" >"$json_path" 2>"$stderr_buf"; then
+    # validate that it parsed as JSON (jq if present, else python)
+    parsed_ok=0
+    if [ "$have_jq" -eq 1 ]; then
+      if jq -e . "$json_path" >/dev/null 2>&1; then parsed_ok=1; fi
+    else
+      if python3 -c 'import json,sys; json.load(open(sys.argv[1]))' "$json_path" >/dev/null 2>&1; then
+        parsed_ok=1
+      fi
+    fi
+
+    if [ "$parsed_ok" -eq 1 ]; then
+      verdict="$(extract_field "$json_path" verdict)"
+      tarpit="$(extract_field "$json_path" tarpit_flag)"
+      [ -z "$tarpit" ] && tarpit="—"
+      match="$(match_truth_to_verdict "$truth" "$verdict")"
+      [ "$match" = "yes" ] && match_disp="✓" || match_disp="✗"
+      [ "$match" = "n/a" ] && match_disp="—"
+      printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$sub" "$slug" "$truth" "$verdict" "$match_disp" "$tarpit" >>"$rows_file"
+      ok_runs=$((ok_runs + 1))
+      case "$truth" in
+        accepted)
+          accepted_total=$((accepted_total + 1))
+          [ "$match" = "yes" ] && accepted_match=$((accepted_match + 1)) ;;
+        rejected)
+          rejected_total=$((rejected_total + 1))
+          [ "$match" = "yes" ] && rejected_match=$((rejected_match + 1)) ;;
+        synthetic-weak)
+          synthetic_total=$((synthetic_total + 1))
+          [ "$match" = "yes" ] && synthetic_match=$((synthetic_match + 1)) ;;
+      esac
+      echo "  verdict=$verdict match=$match_disp"
+    else
+      # Output existed but didn't parse as JSON.
+      mv "$json_path" "$err_path"
+      {
+        echo "claude -p exited 0 but stdout did not parse as JSON."
+        echo "--- stderr ---"
+        cat "$stderr_buf"
+      } >>"$err_path"
+      printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$sub" "$slug" "$truth" "MALFORMED_JSON" "✗" "—" >>"$rows_file"
+      errors=$((errors + 1))
+      echo "  ERROR: malformed JSON, see $err_path"
+    fi
+  else
+    rc=$?
+    {
+      echo "claude -p exited $rc"
+      echo "--- stdout (truncated 4KB) ---"
+      head -c 4096 "$json_path" 2>/dev/null || true
+      echo
+      echo "--- stderr ---"
+      cat "$stderr_buf"
+    } >"$err_path"
+    rm -f "$json_path"
+    printf '%s\t%s\t%s\t%s\t%s\t%s\n' "$sub" "$slug" "$truth" "ERROR" "✗" "—" >>"$rows_file"
+    errors=$((errors + 1))
+    echo "  ERROR: claude exited $rc, see $err_path"
+  fi
+
+  rm -f "$stderr_buf"
+done
+
+# Build summary.md
+summary="$run_dir/summary.md"
+{
+  echo "# yc-review eval run — $run_ts"
+  echo
+  echo "Ran \`bin/yc-review --json\` against $total application(s)."
+  if [ -n "$apps_filter" ]; then
+    echo
+    echo "Filter: \`--apps $apps_filter\`"
+  fi
+  echo
+  echo "## Results"
+  echo
+  echo "| Subdir | Slug | Outcome (truth) | Verdict (skill) | Match? | Tarpit flag |"
+  echo "|--------|------|-----------------|-----------------|--------|-------------|"
+  while IFS=$'\t' read -r sub slug truth verdict match tarpit; do
+    printf '| %s | %s | %s | %s | %s | %s |\n' "$sub" "$slug" "$truth" "$verdict" "$match" "$tarpit"
+  done <"$rows_file"
+  echo
+  echo "## Summary stats"
+  echo
+  echo "- Accepted matched: $accepted_match / $accepted_total"
+  echo "- Rejected matched: $rejected_match / $rejected_total"
+  echo "- Synthetic-weak matched: $synthetic_match / $synthetic_total"
+  echo "- Errors: $errors / $total"
+  echo
+  echo "## Match rules"
+  echo
+  echo "- accepted ↔ INTERVIEW or BORDERLINE → ✓"
+  echo "- rejected ↔ ARCHIVE or BORDERLINE → ✓"
+  echo "- synthetic-weak ↔ ARCHIVE or BORDERLINE → ✓"
+  echo "- everything else → ✗"
+  echo
+  echo "Match is a sanity check that the rubric directionally distinguishes"
+  echo "good answers from bad. It is NOT a predictor of YC acceptance — see"
+  echo "\`evals/README.md\` for caveats."
+} >"$summary"
+
+rm -f "$rows_file"
+
+echo
+echo "run-evals: summary written to $summary"
+echo "run-evals: $ok_runs ok, $errors error(s) across $total app(s)"

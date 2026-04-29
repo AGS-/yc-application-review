@@ -70,8 +70,8 @@ For one-shot reviews from a script or pipeline, use the bash wrapper. It works d
 Try it against the bundled synthetic sample (a deliberately weak draft used to smoke-test the rubric):
 
 ```bash
-./bin/yc-review application-samples/flowsync-weak.md
-./bin/yc-review --json application-samples/flowsync-weak.md | jq .
+./bin/yc-review application-samples/synthetic/flowsync-weak.md
+./bin/yc-review --json application-samples/synthetic/flowsync-weak.md | jq .
 ```
 
 The `--json` flag returns a fixed shape (`verdict`, `verdict_reason`, `what_works`, `what_doesnt[]`, `top_3_fixes`, `the_one_question`, `tarpit_flag`) — useful for building eval suites against published YC applications.
@@ -142,8 +142,28 @@ yc-application-review/
 │   └── yc-review             # headless bash wrapper (claude -p)
 ├── templates/
 │   └── YC_APPLICATION.md     # blank template with the current YC questions
-└── application-samples/      # sample drafts for testing / evals
-    └── flowsync-weak.md      # synthetic weak draft (expected verdict: ARCHIVE)
+├── application-samples/      # sample drafts for testing / evals
+│   ├── README.md             # what's in here, how to add more, methodology
+│   ├── synthetic/            # synthetic drafts (expected outcomes)
+│   ├── accepted/             # publicly-shared YC-accepted applications
+│   └── rejected/             # publicly-shared YC-rejected applications
+└── evals/                    # rubric eval suite
+    └── README.md             # methodology, how to run, how to interpret
+```
+
+## Eval suite
+
+`bin/run-evals` runs `bin/yc-review --json` against every application in
+`application-samples/{accepted,rejected,synthetic}/` and writes results to
+a timestamped directory under `evals/results/`. See `evals/README.md` for
+methodology and how to interpret a run.
+
+```bash
+# Run against everything
+./bin/run-evals
+
+# Run against one or more specific apps
+./bin/run-evals --apps dropbox-s07,buffer-2011
 ```
 
 ## Contributing

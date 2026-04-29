@@ -1,16 +1,18 @@
-<!--
-Synthetic sample: a deliberately weak YC application draft.
-
-Used to smoke-test the bin/yc-review pipeline. Designed to trip every
-anti-pattern in SKILL.md's rubric: jargon-heavy descriptions, waitlist-as-
-demand, "no direct competitors", part-time founders, top-down TAM, tarpit-
-adjacent idea space (generic AI-wrapper SMB workflow automation).
-
-Expected verdict against this draft: ARCHIVE.
-
-Real publicly-shared YC applications will live alongside this in a later
-worktree.
--->
+---
+company: FlowSync
+batch: synthetic
+outcome: synthetic-weak
+source_url: null
+form_version: current
+verbatim: false
+partial: false
+notes: |
+  Synthetic sample: a deliberately weak YC application draft. Designed to
+  trip every anti-pattern in SKILL.md's rubric — jargon-heavy descriptions,
+  waitlist-as-demand, "no direct competitors", part-time founders, top-down
+  TAM, tarpit-adjacent idea space (generic AI-wrapper SMB workflow
+  automation). Expected verdict: ARCHIVE.
+---
 
 # YC Application — FlowSync
 

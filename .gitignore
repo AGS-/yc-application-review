@@ -1,0 +1,6 @@
+# Eval runs are noisy and expensive to regenerate; commit individual
+# results only when they're worth pinning (e.g. for a writeup).
+evals/results/
+
+# OS / editor cruft
+.DS_Store
