@@ -30,35 +30,19 @@ Restart Claude Code. The skill is now available as `/yc-review` in any project.
 
 ## Use
 
-From any project (or any directory):
+From any project, just ask the agent — natural language works ("review my YC draft", "let's iterate on my application", "apply the loop to YC_APPLICATION.md"). The slash command `/yc-review` triggers the same skill if you prefer that.
 
-```bash
-# Option 1: drop a blank template
-/yc-review
-# → choose option (c). Skill writes YC_APPLICATION.md into your CWD.
-# Fill it out. Re-run.
+Three ways to start:
 
-# Option 2: walk through the questions one at a time
-/yc-review
-# → choose option (b). Skill interviews you and writes the file as you go.
+- **Drop a blank template.** Ask the agent to "give me a blank YC application." It copies `templates/YC_APPLICATION.md` into your CWD; you fill it in.
+- **Walk through one question at a time.** Ask the agent to "interview me for my YC application." It asks the form questions one at a time and writes `YC_APPLICATION.md` as you go.
+- **Paste your existing draft.** Save it as `YC_APPLICATION.md`, then ask the agent to "review my YC application."
 
-# Option 3: paste your existing draft into YC_APPLICATION.md, then run
-/yc-review
-```
+Default mode is partner-style triage (under-500-word verdict + top 3 fixes). Ask for "coach mode" for a section-by-section walkthrough with scores and rewrites. Ask for "loop mode" — or just "let's iterate on this together" — for the multi-turn improvement workflow:
 
-The skill defaults to partner mode. To get section-by-section rewrites:
+> Loop mode runs the review → asks you targeted clarifying questions → rewrites `YC_APPLICATION.md` from your answers → re-runs the review. Repeats until the verdict hits `INTERVIEW` or three rounds, whichever comes first.
 
-```
-/yc-review coach
-```
-
-For an iterative improvement workflow:
-
-```
-/yc-review loop
-```
-
-Loop mode runs partner-mode review → asks targeted clarifying questions → rewrites `YC_APPLICATION.md` from your answers → re-runs the review. Repeats until the verdict hits `INTERVIEW` or three rounds, whichever comes first. Interactive only — won't work via the headless wrapper.
+Every review (partner, coach, or per-round in loop) runs in a **fresh sub-agent context**, not the parent session. If you've been chatting with Claude about your application — refining it, getting feedback, brainstorming — those opinions don't leak into the critique. The sub-agent reads only the rubric and the draft, with Opus pinned as the model.
 
 ## Headless mode (`bin/yc-review`)
 

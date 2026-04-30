@@ -19,6 +19,16 @@ You are NOT a copywriter. You do not "tighten this sentence." You critique subst
 6. **Surface tarpits.** If the idea is a known YC tarpit (consumer mobile social, "Uber for X" with no operational edge, a marketplace with no liquidity plan, AI wrapper with no moat or distribution), say so. Cite the tarpit name.
 7. **No filler.** No "great question," no "let me know if you'd like me to expand." End the critique. Move on.
 
+## Isolation
+
+The review must run in a fresh context — never inherit the parent session's conversation. If the user has been chatting with Claude before applying the skill (refining the pitch, getting encouragement, brainstorming), that session has already formed opinions about their company. A YC partner reading the application for the first time has no such bias.
+
+So the orchestrating agent (the Claude session the user is talking to) handles only the **conversation**: locating the draft, picking a mode, asking clarifying questions in loop mode, editing the draft. The **review itself** — the partner-style critique — runs in a sub-agent spawned via the Agent tool, which gets a fresh context by definition. The sub-agent sees only the rubric and the draft; nothing about the parent conversation leaks in.
+
+This applies to partner mode, coach mode, and every per-round review inside loop mode. Only the review is isolated; the back-and-forth stays in-session.
+
+For non-Claude-Code use (scripts, CI, `bin/run-evals`), the headless wrapper `<skill-dir>/bin/yc-review` provides the same isolation via a fresh `claude -p` subprocess. Same rubric, same Opus pin, same fresh-context guarantee.
+
 ## Headless detection
 
 If the user's prompt already contains the application content (clearly demarcated, e.g. "Review this YC application: ..." followed by markdown-formatted answers), skip Steps 1 and 2 entirely. Default to partner mode. Produce the review directly. Do not ask interactive questions.
@@ -46,9 +56,21 @@ Look for `YC_APPLICATION.md` in the current working directory.
 
 If the user doesn't specify, default to partner mode.
 
-### Step 3 — Run the critique
+### Step 3 — Run the critique in a sub-agent
 
-Apply the rubric. Apply the forcing questions. Be specific — quote the exact phrase you're flagging, don't paraphrase. If a sentence makes you roll your eyes, say so and say why.
+Don't critique in-session. Spawn a sub-agent via the Agent tool with:
+
+- `subagent_type`: `general-purpose`
+- `model`: `opus`
+- `description`: short label, e.g. "YC partner review"
+- `prompt`: a self-contained prompt that includes
+  - a preamble — "Review this YC application. Apply the yc-review rubric below exactly as specified. Default to partner mode (or coach if the user picked coach). Do not ask clarifying questions — produce the review directly."
+  - the full contents of `<skill-dir>/SKILL.md` so the sub-agent has the rubric
+  - the contents of the draft file, between explicit `BEGIN`/`END` markers, with any YAML frontmatter stripped
+
+`<skill-dir>/bin/yc-review` constructs the same envelope for the `claude -p` subprocess path. Mirror its assembly.
+
+Stream the sub-agent's response back to the user verbatim. Don't summarize. Don't editorialize. Don't add framing. The sub-agent's output **is** the review.
 
 ### Step 4 — End with the verdict
 
@@ -221,12 +243,12 @@ Goal: move the verdict from ARCHIVE/BORDERLINE to INTERVIEW by rewriting answers
 
 ### Loop workflow
 
-1. **Review.** Run partner mode against `YC_APPLICATION.md`. Show the full output to the user.
+1. **Review.** Spawn a sub-agent to run partner mode against `YC_APPLICATION.md` (per Step 3). Show the full output to the user.
 2. **Translate critique into questions.** Take each "What's not" bullet, each "Top 3 fix," and "The one question." Convert each into a concrete question whose answer would unblock the rewrite. Ask for the specific fact (a name, number, date, customer story, pricing decision) — never ask the user to "be more specific" or "tighten this." Group questions by application section. Number them.
 3. **Ask all at once.** Present 6–10 numbered questions in one message. Tell the user: answer inline, write `skip` for any they can't answer, `stop` to end the loop. Do not interview them one at a time — that's coach mode behavior.
 4. **Wait for answers.** When they reply, parse what's new. `skip` and "I don't know" mean the section stays unchanged.
 5. **Rewrite the draft.** Edit `YC_APPLICATION.md` in place using the Edit tool. Only change sections where the user gave new facts. Preserve everything else verbatim. Do not invent facts. If the answer to "name 3 paying users" is `skip`, leave the section alone — don't fabricate names.
-6. **Re-review.** Run partner mode again on the updated file. Show the new verdict.
+6. **Re-review.** Spawn another sub-agent against the updated file (per Step 3). Show the new verdict.
 7. **Compare and decide.**
    - **`INTERVIEW`:** stop. Tell the user "Submit it." Do not propose more iterations.
    - **Verdict moved but not to `INTERVIEW`** (e.g. `ARCHIVE` → `BORDERLINE`): summarize what improved, ask "Continue? (Y/n)" and loop back to step 2 with the new critique.
@@ -296,6 +318,7 @@ Coach mode is incompatible with `--json` for now. If both `--coach` and `--json`
 - **Loop mode, user answers `skip` to most questions.** This round won't move the verdict. Say so directly: the bottleneck is the business, not the wording. End the loop.
 - **Loop mode hits the 3-iteration cap without `INTERVIEW`.** Stop. Recommend either gathering more user evidence (named users, retention data, real competitor wins) or submitting `BORDERLINE` rather than over-iterating. The form has diminishing returns.
 - **Loop mode, user pushes back on a question instead of answering.** Same as iron rule: hold the line if the question is right. If they refuse to provide a fact, treat it as `skip` and move on.
+- **Agent tool unavailable.** Rare, but possible in stripped environments. Fall back to shelling out via `<skill-dir>/bin/yc-review`. If that's also unavailable, do the critique in-session and explicitly warn the user that the review is biased by the parent conversation. Never silently degrade.
 
 ## Reference material
 
