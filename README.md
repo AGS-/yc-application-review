@@ -52,6 +52,14 @@ The skill defaults to partner mode. To get section-by-section rewrites:
 /yc-review coach
 ```
 
+For an iterative improvement workflow:
+
+```
+/yc-review loop
+```
+
+Loop mode runs partner-mode review → asks targeted clarifying questions → rewrites `YC_APPLICATION.md` from your answers → re-runs the review. Repeats until the verdict hits `INTERVIEW` or three rounds, whichever comes first. Interactive only — won't work via the headless wrapper.
+
 ## Headless mode (`bin/yc-review`)
 
 For one-shot reviews from a script or pipeline, use the bash wrapper. It works directly from this repo with no install step — it inlines `SKILL.md` via `claude --append-system-prompt`.
