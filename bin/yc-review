@@ -137,5 +137,6 @@ EOF
 system_prompt="$(cat "$skill_md")"
 
 exec claude -p \
+  --model opus \
   --append-system-prompt "$system_prompt" \
   "$user_prompt"
