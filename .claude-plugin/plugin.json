@@ -1,0 +1,13 @@
+{
+  "name": "yc-review",
+  "description": "Partner-style critique of a Y Combinator application draft. Reads YC_APPLICATION.md, scores it against what YC partners actually ask, and surfaces what decides archive vs. interview. Terse, blunt, no participation trophies.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Mike Lyons",
+    "email": "mdl0394@gmail.com"
+  },
+  "homepage": "https://github.com/frenchie4111/yc-application-review",
+  "repository": "https://github.com/frenchie4111/yc-application-review",
+  "license": "MIT",
+  "keywords": ["yc", "ycombinator", "startup", "application-review", "founders", "fundraising"]
+}

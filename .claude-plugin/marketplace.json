@@ -1,0 +1,25 @@
+{
+  "name": "yc-tools",
+  "description": "Skills for founders applying to YC.",
+  "owner": {
+    "name": "Mike Lyons",
+    "email": "mdl0394@gmail.com"
+  },
+  "plugins": [
+    {
+      "name": "yc-review",
+      "source": "./",
+      "description": "Partner-style critique of a Y Combinator application draft. Terse, blunt, no participation trophies.",
+      "version": "0.1.0",
+      "author": {
+        "name": "Mike Lyons",
+        "email": "mdl0394@gmail.com"
+      },
+      "homepage": "https://github.com/frenchie4111/yc-application-review",
+      "repository": "https://github.com/frenchie4111/yc-application-review",
+      "license": "MIT",
+      "category": "founders",
+      "tags": ["yc", "ycombinator", "startup", "application-review"]
+    }
+  ]
+}

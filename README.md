@@ -22,11 +22,22 @@ Two modes:
 
 Requires [Claude Code](https://docs.anthropic.com/en/docs/claude-code).
 
-```bash
-git clone https://github.com/YOUR_USERNAME/yc-application-review.git ~/.claude/skills/yc-review
+**Option A — as a plugin (recommended):**
+
+```
+/plugin marketplace add frenchie4111/yc-application-review
+/plugin install yc-review@yc-tools
 ```
 
-Restart Claude Code. The skill is now available as `/yc-review` in any project.
+The skill becomes `/yc-review:yc-review` in any project. `/plugin` runs inside Claude Code itself.
+
+**Option B — as a standalone skill:**
+
+```bash
+git clone https://github.com/frenchie4111/yc-application-review.git ~/.claude/skills/yc-review
+```
+
+Restart Claude Code. The skill is available as `/yc-review` in any project.
 
 ## Use
 

@@ -2,5 +2,12 @@
 # results only when they're worth pinning (e.g. for a writeup).
 evals/results/
 
+# User application drafts (templates/YC_APPLICATION.md is the canonical blank;
+# the root-level copy is whatever the current user is working on).
+/YC_APPLICATION.md
+
+# Session transcripts and improvement-loop logs
+*-yc-application-improvement-loop.txt
+
 # OS / editor cruft
 .DS_Store
