@@ -39,9 +39,12 @@ ARCHIVE or BORDERLINE, the rubric is at least pointing the right way.
 
 - **Form drift.** Pre-2015 YC applications are missing several questions
   the current rubric scores against — most importantly "Are people using
-  your product? How many?" Verdicts on old applications should be read
-  as approximations. Each application's frontmatter records the
-  `form_version` it was written against.
+  your product? How many?" Drift runs the other way too: every sample in
+  `accepted/` and `rejected/` answers questions the W2027 form dropped
+  ("surprising or amusing," "anything else we should know"). The rubric
+  is told not to require them, but it still sees them. Verdicts on old
+  applications should be read as approximations. Each application's
+  frontmatter records the `form_version` it was written against.
 - **Truncated text.** A few sources only published partial answers (e.g.
   ycombinator.com/apply/dropbox displays the application in a structured
   form that abbreviates some fields). Where this is true, `partial: true`

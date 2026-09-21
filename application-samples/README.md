@@ -26,7 +26,8 @@ company: Dropbox
 batch: S07                  # YC batch (S07, W15, W21, …) or "rejected" / "synthetic"
 outcome: accepted           # accepted | rejected | synthetic-weak | unknown
 source_url: https://…       # where the application text was published
-form_version: 2007          # year of the YC form, or "current" if it matches today's
+form_version: 2007          # year of the YC form, or "current" if it matches
+                            # today's (currently W2027)
 verbatim: true              # true if the text is exactly as the founder shared it
 partial: false              # true if some answers are missing or truncated
 notes: |
@@ -66,9 +67,10 @@ untouched.
 4. Write the frontmatter block. Be honest about `verbatim`, `partial`,
    and `form_version`. The eval is only useful if these are accurate.
 5. Format the body to match the current YC question structure where
-   possible (`## Company`, `## Progress`, `## Idea`, `## Founders`,
-   `## Curious`). If the original used different headings — common for
-   pre-2015 applications — preserve the original structure and explain
+   possible (`## Founders`, `## Founder Video`, `## Company`,
+   `## Progress`, `## Idea`, `## Equity`, `## Curious`,
+   `## Batch Preference`). If the original used different headings — common
+   for pre-2015 applications — preserve the original structure and explain
    in `notes:`.
 
 ## What's currently here
@@ -87,6 +89,10 @@ untouched.
 The YC application form has changed substantively over time. Before ~2015
 it was much shorter, didn't ask "Are people using your product?" as a
 distinct question, and didn't require a 50-character description. The
-current rubric in `SKILL.md` is calibrated for the current form. Treat
-verdicts on pre-2015 applications as approximations: a 2007 application
-with no demand-evidence answer is missing data, not failing the rubric.
+current rubric in `SKILL.md` is calibrated for the **W2027** form, which
+dropped "Anything else you would like us to know," "Tell us something
+surprising or amusing," and the category dropdown, and added questions
+about who writes the code, AI models and AI coding tools, prior
+accelerators, and the Equity block. Treat verdicts on older applications
+as approximations: a 2007 application with no demand-evidence answer is
+missing data, not failing the rubric.

@@ -80,42 +80,74 @@ Always close with three things, in this order:
 2. **Top 3 fixes** — the three changes that move the verdict the most. Not five, not seven. Three.
 3. **One question to answer before you submit** — the single hardest question this draft hasn't answered. Often it's "who specifically uses this and what did they do yesterday without it?"
 
-## The application (as of S2026 — verify against apply.ycombinator.com)
+## The application (as of W2027 — verify against apply.ycombinator.com)
+
+### Founders — one profile per founder
+- **Basics:** name, email, phone number, date of birth, gender, city where you currently live
+- **Role:** title (or main responsibility); what percent equity do you have?; do you have at least 10% equity in the company you're applying with?; are you a technical founder?; are you currently in school?; if accepted to YC, will you commit to working exclusively on this project for the next year?
+- **Background:** LinkedIn URL, education, work experience
+- **Social media:** personal website, GitHub URL
+- **Accomplishments:**
+  - Please tell us about a time you most successfully hacked some (non-computer) system to your advantage
+  - In one or two sentences, the most impressive thing other than this startup that you have built or achieved
+  - Tell us about things you've built before — apps, websites, open source contributions. Include URLs if possible
+  - List any competitions/awards you have won, or papers you've published
+
+### Founders — whole application
+- Who writes code, or does other technical work on your product? Was any of it done by a non-founder?
+- Are you looking for a cofounder?
+- *Multi-founder applications only (not rendered on the solo application this list was transcribed from, so treat as unverified for W2027):* an interesting project two or more of you created together; how long have you known each other and how did you meet
+
+### Founder Video
+- 1-minute video, one per founder
 
 ### Company
 - Company name
-- Company URL
 - Describe what your company does in 50 characters or less
-- Describe what your company does in more detail
+- Company URL, if any
+- Demo video
+- Please provide a link to the product, if any
+- If login credentials are required for the link above, enter them here
+- What is your company going to make? Please describe your product and what it does or will do.
 - Where do you live now, and where would the company be based after YC?
-- Explain your decision about location
+- Explain your decision regarding location
 
 ### Progress
 - How far along are you?
-- How long have each of you been working on this? Part-time or full-time?
-- What tech stack are you using? Include AI models / tools / dev tools.
+- How long have each of you been working on this? How much of that has been full-time?
+- What tech stack are you using, or planning to use? Include AI models and AI coding tools you use.
 - Are people using your product?
-- How many active users or customers? How much are you charging?
+- How many active users or customers do you have? How many are paying? Who is paying you the most, and how much do they pay you?
 - Do you have revenue?
-- Anything else we should know going into the interview?
-- If you've applied before with the same idea, what's changed?
+- If you are applying with the same idea as a previous batch, did anything change? If you applied with a different idea, why did you pivot and what did you learn from the last idea?
+- If you have already participated or committed to participate in an incubator, "accelerator" or "pre-accelerator" program, please tell us about it.
 
 ### Idea
-- Why did you pick this idea? Do you have domain expertise? How do you know people need it?
+- Why did you pick this idea to work on? Do you have domain expertise in this area? How do you know people need what you're making?
 - Who are your competitors? What do you understand about your business that they don't?
 - How do or will you make money? How much could you make?
-- Which category best applies to your company?
-- Other ideas you considered
+- If you had any other ideas you considered applying with, please list them
 
-### Founders & Equity
-- Founder names, ages, links, 1-minute video each
-- An interesting project two or more of you created together
-- How long have you known each other? How did you meet?
-- Full-time? Non-competes? Other obligations?
-- Equity split
+### Equity
+- Have you formed ANY legal entity yet?
+- Have you taken any investment yet?
+- Are you currently fundraising?
 
 ### Curious
-- Tell us something surprising or amusing one of you has discovered
+- What convinced you to apply to Y Combinator? Did someone encourage you to apply? Have you been to any YC events?
+- How did you hear about Y Combinator?
+
+### Batch Preference
+- What batch do you want to apply for?
+
+### What changed for W2027
+
+Don't critique a draft against the old form.
+
+- **Gone:** "Anything else you would like us to know going into the interview?", "Tell us something surprising or amusing that one of you has discovered," and the company-category dropdown. Don't ask for them; don't mark a draft down for omitting them.
+- **New:** who writes the code (and whether a non-founder wrote any of it), whether you're looking for a cofounder, prior accelerator participation, the Equity yes/no block, and batch preference. In the founder profile: the Accomplishments block (hacked a non-computer system / most impressive thing / things you've built before / awards and papers), "are you a technical founder?", "at least 10% equity?", "currently in school?", and the exclusivity commitment.
+- **Founder profile:** age is now date of birth, the non-compete question is gone, and "will you work full-time on this?" is now "if accepted to YC, will you commit to working exclusively on this project for the next year?"
+- **Reworded:** "Describe what your company does in more detail" is now "What is your company going to make?" — it invites future tense. The usage question now asks who pays you the most and how much. The tech-stack question now asks for AI models and AI coding tools by name.
 
 ## Per-question rubric
 
@@ -127,10 +159,10 @@ For each major question: **what it's testing**, **what 10/10 looks like**, **ant
 - **Anti-patterns:** "AI-powered platform for…", "next-generation," "disrupting," "we're like X for Y" without specifics, anything containing "leveraging" or "synergy."
 - **Forcing question:** If a 12-year-old read this, would they know what you do?
 
-### "Describe what your company does in more detail"
-- **Tests:** clarity + scope discipline. Are you describing what exists today, or a 3-year vision?
-- **10/10:** First sentence = what it is. Second sentence = who uses it. Third sentence = what they do with it. No fluff.
-- **Anti-patterns:** Three paragraphs about the vision. The word "ecosystem." Stories about why the founders care. Save it.
+### "What is your company going to make? Please describe your product and what it does or will do."
+- **Tests:** clarity + scope discipline. The wording invites future tense — that's a trap. Founders who take the invitation describe only the vision.
+- **10/10:** First sentence = what it is. Second = who uses it. Third = what they do with it. Then, clearly separated, what it will do next. A partner can draw the line between shipped and planned without asking.
+- **Anti-patterns:** Three paragraphs about the vision. The word "ecosystem." Stories about why the founders care. Save it. Future tense that never resolves into a present-tense sentence.
 - **Forcing question:** What is the smallest thing in this paragraph that is actually shipped today?
 
 ### "How far along are you?"
@@ -139,11 +171,29 @@ For each major question: **what it's testing**, **what 10/10 looks like**, **ant
 - **Anti-patterns:** "We're in beta." "We have several users." "Many companies are interested." Everything in passive voice. Anything where the numbers don't add up to the story.
 - **Forcing question:** Read this back as a partner. Are these numbers good, or are you hoping I won't ask follow-ups?
 
-### "Are people using your product? How many?"
-- **Tests:** real demand vs. interest. The single most important question on the form.
-- **10/10:** Named users. WAU/MAU split. Cohort retention if you have it. A specific story: "Sarah at Bakery Co. uses it every Sunday to reconcile Stripe — saves her 4 hours."
-- **Anti-patterns:** "We have a waitlist of 500." (Waitlist ≠ users.) "Several beta testers." "Strong interest from enterprises." Conflating signups with usage. Conflating LinkedIn likes with demand.
+### "How long have each of you been working on this? How much of that has been full-time?"
+- **Tests:** commitment, and whether the timeline matches the traction claimed elsewhere.
+- **10/10:** Dates, not durations. Who is full-time, since when, and what anyone who isn't is doing instead. *"Both full-time since Jan 6. Nights and weekends since October before that."*
+- **Anti-patterns:** "A while." "About six months." "Part-time, going full-time once we get into YC" — partners read that as: not committed, and the traction you're claiming came from a side project.
+- **Forcing question:** If you don't get in, who quits their job anyway?
+
+### "What tech stack are you using? Include AI models and AI coding tools you use."
+- **Tests:** technical judgment. New emphasis on this form — YC wants to see *how* you build, not just what you built.
+- **10/10:** Specific, and every choice earns its place. Which model does what, and why that one. What runs locally vs. hosted, where it matters.
+- **Anti-patterns:** A buzzword list. Six models named with no statement of what any of them do. AI coding tools listed as though they were a moat. Silence about AI in a product whose whole pitch is AI.
+- **Forcing question:** Which part of this stack would you defend in a technical interview, and which part is there because it was the default?
+
+### "Are people using your product?" / "How many active users? How many are paying? Who pays you the most?"
+- **Tests:** real demand vs. interest. The single most important question on the form. The "who pays you the most" sub-question is a concentration test — it wants a name and a number.
+- **10/10:** Named users. WAU/MAU split. Paying count stated separately from active count. Largest account named, with what they pay. Cohort retention if you have it. A specific story: "Sarah at Bakery Co. uses it every Sunday to reconcile Stripe — saves her 4 hours."
+- **Anti-patterns:** "We have a waitlist of 500." (Waitlist ≠ users.) "Several beta testers." "Strong interest from enterprises." Conflating signups with usage. Conflating LinkedIn likes with demand. Answering "yes, people are using it" and then leaving the how-many question blank — partners read the two answers together.
 - **Forcing question:** What is *one specific person* doing with this product today, by name? What did they do yesterday without it?
+
+### "If you applied before: what changed? If you applied with a different idea: why did you pivot?"
+- **Tests:** learning rate. YC funds people who update on evidence.
+- **10/10:** The specific evidence that forced the change, and what you now believe that you didn't before. A pivot that reads as a conclusion drawn from users, not a change of mood.
+- **Anti-patterns:** "We refined our positioning." Pivots justified by market size rather than by something you learned. Rewriting history so the old idea sounds like a deliberate step toward this one.
+- **Forcing question:** What did you believe six months ago that you now think was wrong? What changed your mind?
 
 ### "Why did you pick this idea? Do you have domain expertise? How do you know people need it?"
 - **Tests:** founder-market fit + evidence of user research.
@@ -163,21 +213,62 @@ For each major question: **what it's testing**, **what 10/10 looks like**, **ant
 - **Anti-patterns:** "$X trillion market." Any TAM number you got from a Gartner press release. "We'll figure out monetization later." "Freemium with enterprise tier" with no enterprise validation.
 - **Forcing question:** If this works, what does ARR look like in 3 years? Defend the number.
 
-### "Tell us about an interesting project you created together"
-- **Tests:** can these founders ship together? Have they shipped before?
+### "If you had any other ideas you considered applying with, please list them"
+- **Tests:** range, and honesty. YC says outright that they sometimes fund the idea listed here instead of the main one. Blank is a wasted slot.
+- **10/10:** Two or three real alternatives, a line each, every one something you'd actually work on.
+- **Anti-patterns:** Blank. Deliberately weak ideas listed to make the main one look inevitable. Tarpits listed without noticing they're tarpits.
+- **Forcing question:** If a partner said "we'd fund the second one, not the first" — would you take it?
+
+### "Who writes code, or does other technical work on your product? Was any of it done by a non-founder?"
+- **Tests:** whether the founding team can actually build this. New on this form, and it is a direct question — answer it directly.
+- **10/10:** Names which founder writes what. States plainly if an agency, contractor, or friend wrote any of it. *"Our first version was a contractor's; we rewrote it in March"* beats implying otherwise — YC finds out in the interview.
+- **Anti-patterns:** "We built it together" when one person wrote all of it. Omitting the contractor. Heavy AI-assisted coding offered as the answer to "who is technical" — the question is who debugs it at 2am.
+- **Forcing question:** If your technical cofounder left tomorrow, who ships the next feature?
+
+### "Tell us about things you've built before. Include URLs if possible."
+- **Tests:** shipping history. Asked per founder, and the URLs are the whole point of the question.
+- **10/10:** A short list. Each item: what it was, who used it, and a link a partner can open. Scale stated plainly — *"used by every team in the org," "3k stars," "1,200 weekly users."*
+- **Anti-patterns:** A list with no URLs when the question asks for URLs. Internal-only work written as though it were public — a partner can't open it, so say what it did and how many people used it. Class projects. Things you contributed to, described as things you built.
+- **Forcing question:** Which of these can a partner open in a browser right now?
+
+### "A time you most successfully hacked some (non-computer) system to your advantage"
+- **Tests:** resourcefulness. YC's oldest personality question, and with "surprising or amusing" gone it now carries that weight too. They want evidence you route around rules most people accept.
+- **10/10:** One specific incident. What you noticed that others didn't, what you did, what you got. Small stakes are fine — the mechanism is the point.
+- **Anti-patterns:** A normal work story about winning people over — that's a job, not a hack. Anything with no outcome. Anything dishonest enough to read as a character risk rather than a green flag. Blank.
+- **Forcing question:** What did you get that the system wasn't set up to give you?
+
+### "The most impressive thing other than this startup that you have built or achieved"
+- **Tests:** raw ability, under a length limit. They asked for one or two sentences; the limit is part of the test.
+- **10/10:** One concrete thing with scale or a number attached, verifiable in thirty seconds.
+- **Anti-patterns:** Three paragraphs. A team accomplishment where your own role is invisible. A job title offered as an achievement. "Led" with no object.
+- **Forcing question:** Could a stranger confirm this without taking your word for it?
+
+### "List any competitions/awards you have won, or papers you've published"
+- **Tests:** little on its own. Real signal only where the bar is externally known — IMO, ICPC, a paper people cite.
+- **10/10:** The award, the year, the bar. One line.
+- **Anti-patterns:** Internal company awards presented as external validation — if you list one, state the selection bar. Participation. Padding.
+
+### The Role block — gates, not essays
+Six short fields per founder, and several are gates rather than answers. Read them against each other before reading anything else:
+
+- **"Will you commit to working exclusively on this project for the next year: no"** is close to disqualifying on its own.
+- **A founder under 10% equity** raises a question the rest of the application has to answer.
+- **"Currently in school: yes"** with no stated plan.
+- **"Are you a technical founder: no"** across every founder, sitting next to a who-writes-code answer that names a contractor or an AI coding tool. That combination is one of the most common reasons an application that reads well gets archived.
+
+### "An interesting project two or more of you created together" (multi-founder applications)
+- **Tests:** can these founders ship *together*? Have they shipped before?
 - **10/10:** A specific shipped artifact with a URL. Bonus if non-trivial.
 - **Anti-patterns:** Class projects with no link. "We've been brainstorming together for 5 years." Hackathon submissions that died at the demo.
 - **Forcing question:** What did this project teach you about working together that's relevant to running this company?
 
-### "Anything else we should know"
-- **Tests:** judgment. What you choose to put here reveals how you prioritize.
-- **10/10:** A specific signal that wouldn't fit elsewhere — a key advisor, a relevant prior exit, a piece of unusual evidence.
-- **Anti-patterns:** Repeating things you said elsewhere. Generic enthusiasm. Leaving it blank.
+### "What convinced you to apply to Y Combinator? Have you been to any YC events?"
+- **Tests:** whether there's a real person behind the form. With "tell us something surprising or amusing" gone, this is the only free-form slot left where personality shows.
+- **10/10:** Short, specific, true. A person you talked to, a thing you read, a thing you want out of the batch.
+- **Anti-patterns:** Reciting YC's mission back at them. Flattery. Anything that reads like an LLM wrote it — partners have read 50,000 of these and spot it instantly.
 
-### "Tell us something surprising or amusing"
-- **Tests:** personality + signal that you're a real human.
-- **10/10:** Genuinely specific, slightly weird, hints at how the founder thinks. Short.
-- **Anti-patterns:** Anything that sounds like a LinkedIn post. Anything where the answer is itself a humblebrag about the company. Anything written by an LLM.
+### Low-signal questions
+Cofounder search, prior accelerator, the company Equity yes/no block, "how did you hear about YC," demo video and product link, and the founder Basics and Background fields. Don't spend critique budget here — the Role block above is the exception. Raise them only when they **contradict** something else: a fundraise in progress the money answer never mentions, a prior accelerator that explains traction the Progress section presents as organic, "looking for a cofounder: yes" next to a two-founder equity split, or "yes, people are using it" with no product link and no demo. Flag the contradiction, not the answer.
 
 ## Forcing questions to apply across the whole draft
 
@@ -190,6 +281,7 @@ After reading every section, run these:
 5. **Why now.** Why is this possible *now*, that wasn't possible 3 years ago? If there's no answer, this is probably a tarpit.
 6. **Why you.** Why is this team the team that wins this? If the answer is generic, the team isn't differentiated yet.
 7. **Tarpit check.** Is this on the YC tarpit list (consumer social, marketplace with no supply plan, "AI for X" wrapper with no distribution moat, productivity tool for a market that won't pay)? If yes, name it.
+8. **Consistency.** Do the answers contradict each other? "Are people using your product: yes" with no user count. Revenue claimed with no paying customer. "Currently fundraising: yes" with no answer on how the business makes money. Partners read these together.
 
 ## Output format
 
